@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-import { useFhevm } from "@fhevm-sdk";
 import { useAccount } from "wagmi";
 import { RainbowKitCustomConnectButton } from "~~/components/helper/RainbowKitCustomConnectButton";
 import { useFHECounterWagmi } from "~~/hooks/fhecounter-example/useFHECounterWagmi";
@@ -13,44 +11,19 @@ import { useFHECounterWagmi } from "~~/hooks/fhecounter-example/useFHECounterWag
  *  - "Decrement" button: allows you to decrement the FHECounter count handle using FHE operations.
  */
 export const FHECounterDemo = () => {
-  const { isConnected, chain } = useAccount();
-
-  const chainId = chain?.id;
-
-  //////////////////////////////////////////////////////////////////////////////
-  // FHEVM instance
-  //////////////////////////////////////////////////////////////////////////////
-
-  // Create EIP-1193 provider from wagmi for FHEVM
-  const provider = useMemo(() => {
-    if (typeof window === "undefined") return undefined;
-
-    // Get the wallet provider from window.ethereum
-    return (window as any).ethereum;
-  }, []);
+  const { isConnected } = useAccount();
 
   const initialMockChains = { 31337: "http://localhost:8545" };
-
-  const {
-    instance: fhevmInstance,
-    status: fhevmStatus,
-    error: fhevmError,
-  } = useFhevm({
-    provider,
-    chainId,
-    initialMockChains,
-    enabled: true, // use enabled to dynamically create the instance on-demand
-  });
 
   //////////////////////////////////////////////////////////////////////////////
   // useFHECounter is a custom hook containing all the FHECounter logic, including
   // - calling the FHECounter contract
   // - encrypting FHE inputs
   // - decrypting FHE handles
+  // Now using the new SDK structure!
   //////////////////////////////////////////////////////////////////////////////
 
   const fheCounter = useFHECounterWagmi({
-    instance: fhevmInstance,
     initialMockChains,
   });
 
@@ -182,9 +155,8 @@ export const FHECounterDemo = () => {
         <div className={sectionClass}>
           <h3 className={titleClass}>🔧 FHEVM Instance</h3>
           <div className="space-y-3">
-            {printProperty("Instance Status", fhevmInstance ? "✅ Connected" : "❌ Disconnected")}
-            {printProperty("Status", fhevmStatus)}
-            {printProperty("Error", fhevmError ?? "No errors")}
+            {printProperty("Instance Status", fheCounter.instance ? "✅ Connected" : "❌ Disconnected")}
+            {printProperty("Status", fheCounter.fhevmStatus)}
           </div>
         </div>
 

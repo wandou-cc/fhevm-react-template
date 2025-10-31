@@ -1,11 +1,21 @@
 {
   "name": "@fhevm-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "src/index.ts",
+  "description": "Universal FHEVM SDK - Framework-agnostic SDK for Fully Homomorphic Encryption",
+  "keywords": [
+    "fhevm",
+    "fhe",
+    "encryption",
+    "zama",
+    "web3",
+    "blockchain",
+    "privacy"
+  ],
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -19,13 +29,25 @@
       "types": "./src/storage/index.ts",
       "default": "./dist/storage/index.js"
     },
-    "./types": {
-      "types": "./src/fhevmTypes.ts",
-      "default": "./dist/fhevmTypes.js"
+    "./adapters": {
+      "types": "./src/adapters/index.ts",
+      "default": "./dist/adapters/index.js"
     },
-    "./react": {
-      "types": "./src/react/index.ts",
-      "default": "./dist/react/index.js"
+    "./adapters/ethers": {
+      "types": "./src/adapters/ethers.ts",
+      "default": "./dist/adapters/ethers.js"
+    },
+    "./types": {
+      "types": "./src/types.ts",
+      "default": "./dist/types.js"
+    },
+    "./errors": {
+      "types": "./src/errors.ts",
+      "default": "./dist/errors.js"
+    },
+    "./utils": {
+      "types": "./src/utils/index.ts",
+      "default": "./dist/utils/index.js"
     }
   },
   "scripts": {

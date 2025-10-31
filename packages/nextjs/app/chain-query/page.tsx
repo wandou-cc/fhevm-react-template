@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { FHECounterDemo } from "./_components/FHECounterDemo";
+import { ChainQueryDemo } from "../_components/ChainQueryDemo";
 
-export default function Home() {
+export default function ChainQueryPage() {
   return (
     <div className="flex flex-col gap-8 items-center sm:items-start w-full px-3 md:px-0">
       {/* Navigation */}
-      <div className="w-full flex justify-center gap-4 mb-4 flex-wrap">
+      <div className="w-full flex justify-center gap-4 mb-4">
         <Link
           href="/"
-          className="px-6 py-2 bg-[#FFD208] text-[#2D2D2D] font-semibold rounded-lg hover:bg-[#A38025] transition-colors"
+          className="px-6 py-2 bg-black text-[#F4F4F4] font-semibold rounded-lg hover:bg-[#1F1F1F] transition-colors"
         >
           🔢 FHE Counter
         </Link>
@@ -20,7 +20,7 @@ export default function Home() {
         </Link>
         <Link
           href="/chain-query"
-          className="px-6 py-2 bg-black text-[#F4F4F4] font-semibold rounded-lg hover:bg-[#1F1F1F] transition-colors"
+          className="px-6 py-2 bg-[#FFD208] text-[#2D2D2D] font-semibold rounded-lg hover:bg-[#A38025] transition-colors"
         >
           📊 链上查询
         </Link>
@@ -31,7 +31,8 @@ export default function Home() {
           ⚡ WebWorker
         </Link>
       </div>
-      <FHECounterDemo />
+      <ChainQueryDemo />
     </div>
   );
 }
+
