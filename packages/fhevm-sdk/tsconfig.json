@@ -11,8 +11,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "types": ["node"]
+    "types": ["node"],
   },
   "include": ["src/**/*"]
 }

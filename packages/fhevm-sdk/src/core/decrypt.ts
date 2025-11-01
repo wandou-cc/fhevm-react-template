@@ -57,68 +57,107 @@ export async function decrypt(
   params: DecryptParams
 ): Promise<DecryptedResults> {
   const { signer, requests } = params;
+  const startTime = Date.now();
 
-  // Get instance from params or client cache
-  const instance = params.instance ?? client.instance;
+  // Emit start event
+  client.events.emit('decrypt:start', {
+    requests,
+    timestamp: startTime,
+  });
 
-  if (!instance) {
-    throw new FhevmConfigError(
-      "FHEVM instance is required. Create one using createInstance() first."
-    );
-  }
-
-  if (!signer) {
-    throw new FhevmConfigError("Signer is required for decryption");
-  }
-
-  // Validate requests
-  validateDecryptRequests(requests);
-
-  client.debug(`Decrypting ${requests.length} handle(s)`);
-
+  // Execute with middleware
   try {
-    // Get unique contract addresses
-    const uniqueAddresses = Array.from(
-      new Set(requests.map((r) => r.contractAddress))
-    ) as `0x${string}`[];
+    const results = await client.middleware.decrypt.execute(
+      {
+        type: 'decrypt',
+        client,
+        requestCount: requests.length,
+        timestamp: startTime,
+      },
+      async () => {
+        // Get instance from params or client cache
+        const instance = params.instance ?? client.instance;
 
-    client.debug(`Unique contracts: ${uniqueAddresses.length}`);
+        if (!instance) {
+          throw new FhevmConfigError(
+            "FHEVM instance is required. Create one using createInstance() first."
+          );
+        }
 
-    // Load or create decryption signature
-    client.debug("Creating/loading decryption signature");
-    
-    const signature = await FhevmDecryptionSignature.loadOrSign(
-      instance,
-      uniqueAddresses,
-      signer as any, // Cast to internal type
-      client.storage
+        if (!signer) {
+          throw new FhevmConfigError("Signer is required for decryption");
+        }
+
+        // Validate requests
+        validateDecryptRequests(requests);
+
+        client.debug(`Decrypting ${requests.length} handle(s)`);
+
+        // Get unique contract addresses
+        const uniqueAddresses = Array.from(
+          new Set(requests.map((r) => r.contractAddress))
+        ) as `0x${string}`[];
+
+        client.debug(`Unique contracts: ${uniqueAddresses.length}`);
+
+        // Load or create decryption signature
+        client.debug("Creating/loading decryption signature");
+        
+        const signature = await FhevmDecryptionSignature.loadOrSign(
+          instance,
+          uniqueAddresses,
+          signer as any, // Cast to internal type
+          client.storage
+        );
+
+        if (!signature) {
+          throw new FhevmSignatureError("Failed to create decryption signature");
+        }
+
+        client.debug("Signature obtained, performing userDecrypt");
+
+        // Perform userDecrypt
+        const results = await instance.userDecrypt(
+          requests.map((r) => ({
+            handle: r.handle,
+            contractAddress: r.contractAddress as `0x${string}`,
+          })),
+          signature.privateKey,
+          signature.publicKey,
+          signature.signature,
+          signature.contractAddresses,
+          signature.userAddress,
+          signature.startTimestamp,
+          signature.durationDays
+        );
+
+        client.debug(`Decryption successful: ${Object.keys(results).length} value(s)`);
+
+        return results;
+      }
     );
 
-    if (!signature) {
-      throw new FhevmSignatureError("Failed to create decryption signature");
-    }
-
-    client.debug("Signature obtained, performing userDecrypt");
-
-    // Perform userDecrypt
-    const results = await instance.userDecrypt(
-      requests.map((r) => ({
-        handle: r.handle,
-        contractAddress: r.contractAddress as `0x${string}`,
-      })),
-      signature.privateKey,
-      signature.publicKey,
-      signature.signature,
-      signature.contractAddresses,
-      signature.userAddress,
-      signature.startTimestamp,
-      signature.durationDays
-    );
-
-    client.debug(`Decryption successful: ${Object.keys(results).length} value(s)`);
+    // Emit success event
+    client.events.emit('decrypt:success', {
+      results,
+      timestamp: Date.now(),
+      duration: Date.now() - startTime,
+    });
 
     return results;
   } catch (error: any) {
+    // Emit error event
+    client.events.emit('decrypt:error', {
+      error,
+      timestamp: Date.now(),
+    });
+
+    client.events.emit('error', {
+      error,
+      context: { type: 'decrypt', requestCount: requests.length },
+      timestamp: Date.now(),
+    });
+
     // Check for signature errors
     if (error.message?.includes("signature") || error.message?.includes("sign")) {
       throw new FhevmSignatureError(

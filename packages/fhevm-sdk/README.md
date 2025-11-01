@@ -4,12 +4,14 @@ Universal SDK for Fully Homomorphic Encryption Virtual Machine (FHEVM) - A pure,
 
 ## ✨ Features
 
-- 🌐 **100% Framework-Agnostic** - Pure TypeScript, works anywhere (Node.js, Next.js, Vue, React, Deno, Bun)
-- 🎯 **Wagmi-like API** - Familiar structure for web3 developers
-- 🔧 **Modular Design** - Import only what you need
-- 🔐 **Type-Safe** - Full TypeScript support
-- 📦 **Zero Framework Dependencies** - Pure SDK, no React/Vue/etc dependencies
-- ⚡ **Batch Operations** - Efficient batch encrypt/decrypt support
+- 🌐 **100% Framework-Agnostic** - Pure TypeScript, works in any environment
+- 🎯 **Production-Ready** - Built-in retry, deduplication, error recovery
+- 🔧 **Modular & Extensible** - Plugin system, middleware, custom adapters
+- 🔐 **Type-Safe** - Full TypeScript support with advanced types
+- 📦 **Zero Framework Dependencies** - Pure SDK, works with any framework
+- ⚡ **High Performance** - Advanced caching (TTL, LRU), performance monitoring
+- 📡 **Observable** - Comprehensive event system and metrics
+- 🧪 **Testing-Friendly** - Complete mocking and testing utilities
 - 🚀 **Quick Setup** - Get started in less than 10 lines of code
 
 ## 🚀 Quick Start

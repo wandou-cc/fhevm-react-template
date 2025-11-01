@@ -9,3 +9,4 @@ packages/*/.turbo
 packages/*/coverage
 tmp*
 .vscode
+**/*/node_modules

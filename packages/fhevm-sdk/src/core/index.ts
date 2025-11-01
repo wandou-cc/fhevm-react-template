@@ -34,15 +34,6 @@ export {
 } from "./encrypt";
 
 // ============================================
-// Encryption with WebWorker
-// ============================================
-export {
-  encryptWithWorker,
-  FheWorkerManager,
-  type EncryptWithWorkerParams,
-} from "./encryptWorker";
-
-// ============================================
 // Decryption
 // ============================================
 export {

@@ -7,6 +7,10 @@ import type { FhevmInstance } from "../fhevmTypes";
 import type { ClientConfig, Storage } from "../types";
 import { validateClientConfig } from "../utils/validation";
 import { GenericStringInMemoryStorage } from "../storage/GenericStringStorage";
+import { FhevmEventEmitter } from "../events";
+import { MiddlewareChain } from "../middleware";
+import { PluginManager } from "../plugin";
+import type { FhevmPlugin } from "../plugin";
 
 /**
  * FHEVM Client
@@ -16,6 +20,12 @@ export class FhevmClient {
   private _config: ClientConfig;
   private _storage: Storage;
   private _instance?: FhevmInstance;
+  private _events: FhevmEventEmitter;
+  private _middleware: {
+    encrypt: MiddlewareChain;
+    decrypt: MiddlewareChain;
+  };
+  private _plugins: PluginManager;
 
   constructor(config: ClientConfig) {
     // Validate configuration (allow undefined network for SSR)
@@ -23,6 +33,16 @@ export class FhevmClient {
 
     this._config = config;
     this._storage = config.storage ?? new GenericStringInMemoryStorage();
+    this._events = new FhevmEventEmitter();
+    this._middleware = {
+      encrypt: new MiddlewareChain(),
+      decrypt: new MiddlewareChain(),
+    };
+    this._plugins = new PluginManager({
+      client: this,
+      events: this._events,
+      middleware: this._middleware,
+    });
   }
 
   /**
@@ -47,6 +67,27 @@ export class FhevmClient {
   }
 
   /**
+   * Get event emitter
+   */
+  get events(): FhevmEventEmitter {
+    return this._events;
+  }
+
+  /**
+   * Get middleware chains
+   */
+  get middleware() {
+    return this._middleware;
+  }
+
+  /**
+   * Get plugin manager
+   */
+  get plugins(): PluginManager {
+    return this._plugins;
+  }
+
+  /**
    * Set instance (used internally by createInstance)
    * @internal
    */
@@ -59,6 +100,7 @@ export class FhevmClient {
    */
   clearInstance(): void {
     this._instance = undefined;
+    this._events.emit('cache:clear', { timestamp: Date.now() });
   }
 
   /**
@@ -74,7 +116,15 @@ export class FhevmClient {
   debug(message: string, ...args: any[]): void {
     if (this.isDebug()) {
       console.log(`[FHEVM SDK] ${message}`, ...args);
+      this._events.emit('debug', { message, data: args, timestamp: Date.now() });
     }
+  }
+
+  /**
+   * Use a plugin
+   */
+  async use(plugin: FhevmPlugin, config?: any): Promise<void> {
+    await this._plugins.use(plugin, config);
   }
 }
 

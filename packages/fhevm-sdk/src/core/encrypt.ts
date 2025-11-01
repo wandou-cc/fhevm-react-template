@@ -58,45 +58,88 @@ export async function encrypt(
   params: EncryptParams
 ): Promise<EncryptResult> {
   const { contractAddress, userAddress, buildInputs } = params;
+  const startTime = Date.now();
   
-  // Get instance from params or client cache
-  const instance = params.instance ?? client.instance;
-  
-  if (!instance) {
-    throw new FhevmConfigError(
-      "FHEVM instance is required. Create one using createInstance() first."
-    );
-  }
+  // Emit start event
+  client.events.emit('encrypt:start', {
+    contractAddress,
+    userAddress,
+    timestamp: startTime,
+  });
 
-  // Validate parameters
-  validateContractAddress(contractAddress);
-  validateUserAddress(userAddress);
-
-  if (typeof buildInputs !== "function") {
-    throw new FhevmConfigError("buildInputs must be a function");
-  }
-
-  client.debug(`Encrypting for contract ${contractAddress}`);
-
+  // Execute with middleware
   try {
-    // Create encrypted input
-    const input = instance.createEncryptedInput(
-      contractAddress,
-      userAddress
-    ) as EncryptedInputBuilder;
+    const result = await client.middleware.encrypt.execute(
+      {
+        type: 'encrypt',
+        client,
+        contractAddress,
+        userAddress,
+        timestamp: startTime,
+      },
+      async () => {
+        // Get instance from params or client cache
+        const instance = params.instance ?? client.instance;
+        
+        if (!instance) {
+          throw new FhevmConfigError(
+            "FHEVM instance is required. Create one using createInstance() first."
+          );
+        }
 
-    // Build inputs
-    await buildInputs(input);
+        // Validate parameters
+        validateContractAddress(contractAddress);
+        validateUserAddress(userAddress);
 
-    // Perform encryption
-    const result = await input.encrypt();
+        if (typeof buildInputs !== "function") {
+          throw new FhevmConfigError("buildInputs must be a function");
+        }
 
-    client.debug(
-      `Encryption successful: ${result.handles.length} handles, proof size ${result.inputProof.length}`
+        client.debug(`Encrypting for contract ${contractAddress}`);
+
+        // Create encrypted input
+        const input = instance.createEncryptedInput(
+          contractAddress,
+          userAddress
+        ) as EncryptedInputBuilder;
+
+        // Build inputs
+        await buildInputs(input);
+
+        // Perform encryption
+        const result = await input.encrypt();
+
+        client.debug(
+          `Encryption successful: ${result.handles.length} handles, proof size ${result.inputProof.length}`
+        );
+
+        return result;
+      }
     );
+
+    // Emit success event
+    client.events.emit('encrypt:success', {
+      contractAddress,
+      result,
+      timestamp: Date.now(),
+      duration: Date.now() - startTime,
+    });
 
     return result;
   } catch (error: any) {
+    // Emit error event
+    client.events.emit('encrypt:error', {
+      contractAddress,
+      error,
+      timestamp: Date.now(),
+    });
+
+    client.events.emit('error', {
+      error,
+      context: { type: 'encrypt', contractAddress, userAddress },
+      timestamp: Date.now(),
+    });
+
     throw new FhevmEncryptionError(
       `Encryption failed: ${error?.message || "Unknown error"}`,
       error

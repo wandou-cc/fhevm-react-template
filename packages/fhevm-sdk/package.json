@@ -41,6 +41,10 @@
       "types": "./src/types.ts",
       "default": "./dist/types.js"
     },
+    "./types/utils": {
+      "types": "./src/types.utils.ts",
+      "default": "./dist/types.utils.js"
+    },
     "./errors": {
       "types": "./src/errors.ts",
       "default": "./dist/errors.js"
@@ -48,6 +52,26 @@
     "./utils": {
       "types": "./src/utils/index.ts",
       "default": "./dist/utils/index.js"
+    },
+    "./events": {
+      "types": "./src/events.ts",
+      "default": "./dist/events.js"
+    },
+    "./middleware": {
+      "types": "./src/middleware.ts",
+      "default": "./dist/middleware.js"
+    },
+    "./cache": {
+      "types": "./src/cache.ts",
+      "default": "./dist/cache.js"
+    },
+    "./plugin": {
+      "types": "./src/plugin.ts",
+      "default": "./dist/plugin.js"
+    },
+    "./testing": {
+      "types": "./src/testing.ts",
+      "default": "./dist/testing.js"
     }
   },
   "scripts": {
@@ -63,18 +87,15 @@
   "peerDependencies": {
     "@fhevm/mock-utils": "^0.1.0",
     "@zama-fhe/relayer-sdk": "^0.2.0",
-    "ethers": "^6.13.4",
-    "react": "^18.0.0 || ^19.0.0"
+    "ethers": "^6.13.4"
   },
   "devDependencies": {
     "@types/node": "~18.19.50",
-    "@types/react": "~19.0.7",
     "@vitest/coverage-v8": "2.1.9",
     "@zama-fhe/relayer-sdk": "0.2.0",
     "ethers": "^6.13.7",
     "fake-indexeddb": "~6.0.0",
     "jsdom": "^27.0.0",
-    "react": "~19.0.0",
     "typescript": "~5.8.2",
     "vitest": "~2.1.8"
   }

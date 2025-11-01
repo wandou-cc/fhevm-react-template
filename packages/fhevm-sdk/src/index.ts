@@ -83,17 +83,79 @@ export {
 } from "./adapters/rpc";
 
 // ============================================
-// WebWorker for Heavy Computations
-// ============================================
-export {
-  FheWorker,
-  type FheWorkerConfig,
-  type FheWorkerResult,
-  type FheWorkerMessage,
-  type FheWorkerMessageType,
-} from "./workers/FheWorker";
-
-// ============================================
 // Advanced (for custom implementations)
 // ============================================
 export { FhevmDecryptionSignature } from "./FhevmDecryptionSignature";
+
+// ============================================
+// Events System
+// ============================================
+export * from "./events";
+export type { FhevmEventMap, EventListener } from "./events";
+export { FhevmEventEmitter, globalEmitter } from "./events";
+
+// ============================================
+// Middleware System
+// ============================================
+export * from "./middleware";
+export type {
+  Middleware,
+  MiddlewareContext,
+  EncryptContext,
+  DecryptContext,
+  PerformanceMetric,
+} from "./middleware";
+export {
+  MiddlewareChain,
+  retryMiddleware,
+  dedupeMiddleware,
+  performanceMiddleware,
+  rateLimitMiddleware,
+  loggingMiddleware,
+} from "./middleware";
+
+// ============================================
+// Cache System
+// ============================================
+export * from "./cache";
+export type { CacheOptions, CacheStats } from "./cache";
+export {
+  AdvancedCache,
+  AsyncCache,
+  MultiLevelCache,
+} from "./cache";
+
+// ============================================
+// Plugin System
+// ============================================
+export * from "./plugin";
+export type { FhevmPlugin, PluginContext } from "./plugin";
+export {
+  PluginManager,
+  createPlugin,
+  analyticsPlugin,
+  performancePlugin,
+  errorRecoveryPlugin,
+  cacheWarmingPlugin,
+  devToolsPlugin,
+} from "./plugin";
+
+// ============================================
+// Testing Utilities
+// ============================================
+export * from "./testing";
+export {
+  MockStorage,
+  MockSigner,
+  MockNetworkProvider,
+  MockFhevmInstance,
+  MockEncryptedInputBuilder,
+  createMockClient,
+  wait,
+  waitFor,
+  createSpy,
+  Spy,
+  assert,
+  describe,
+  it,
+} from "./testing";
